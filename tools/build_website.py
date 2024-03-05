@@ -41,7 +41,7 @@ def update() -> None:
     new_entries = glob(os.path.join(htmldir, '*'))
     for e in new_entries:
         shutil.move(e, webdir)
-    subprocess.check_call('git add *', shell=True, cwd=webdir)
+    subprocess.check_call('git add *', shell=False, cwd=webdir)
     subprocess.check_call(['git', 'commit', '-a', '-m', 'Bleep. Bloop. I am a bot.'],
                           cwd=webdir)
     subprocess.check_call(['git', 'push'], cwd=webdir)
