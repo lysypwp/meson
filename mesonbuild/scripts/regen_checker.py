@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 import sys, os
-import pickle, subprocess
+import subprocess
 import typing as T
 from ..coredata import CoreData
 from ..backend.backends import RegenInfo
 from ..mesonlib import OptionKey
+import fickling
 
 # This could also be used for XCode.
 
@@ -39,10 +40,10 @@ def run(args: T.List[str]) -> int:
     dumpfile = os.path.join(private_dir, 'regeninfo.dump')
     coredata_file = os.path.join(private_dir, 'coredata.dat')
     with open(dumpfile, 'rb') as f:
-        regeninfo = pickle.load(f)
+        regeninfo = fickling.load(f)
         assert isinstance(regeninfo, RegenInfo)
     with open(coredata_file, 'rb') as f:
-        coredata = pickle.load(f)
+        coredata = fickling.load(f)
         assert isinstance(coredata, CoreData)
     backend = coredata.get_option(OptionKey('backend'))
     assert isinstance(backend, str)

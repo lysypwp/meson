@@ -6,12 +6,12 @@ from __future__ import annotations
 import os
 import sys
 import argparse
-import pickle
 import subprocess
 import typing as T
 import locale
 
 from ..utils.core import ExecutableSerialisation
+import fickling
 
 def buildparser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Custom executable wrapper for Meson. Do not run on your own, mmm\'kay?')
@@ -104,7 +104,7 @@ def run(args: T.List[str]) -> int:
         if cmd_args or options.capture or options.feed:
             parser.error('no other arguments can be used with --unpickle')
         with open(options.unpickle, 'rb') as f:
-            exe = pickle.load(f)
+            exe = fickling.load(f)
             exe.pickled = True
     else:
         exe = ExecutableSerialisation(cmd_args, capture=options.capture, feed=options.feed)
