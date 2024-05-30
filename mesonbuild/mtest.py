@@ -18,7 +18,6 @@ import multiprocessing
 import os
 import pickle
 import platform
-import random
 import re
 import signal
 import subprocess
@@ -40,6 +39,7 @@ from .mesonlib import (MesonException, OptionKey, OrderedSet, RealPathAction,
 from .mintro import get_infodir, load_info_file
 from .programs import ExternalProgram
 from .backend.backends import TestProtocol, TestSerialisation
+import secrets
 
 if T.TYPE_CHECKING:
     TYPE_TAPResult = T.Union['TAPParser.Test',
@@ -1404,7 +1404,7 @@ class SingleTestRunner:
         # because it is extremely useful to have.
         # Setting MALLOC_PERTURB_="0" will completely disable this feature.
         if ('MALLOC_PERTURB_' not in env or not env['MALLOC_PERTURB_']) and not options.benchmark:
-            env['MALLOC_PERTURB_'] = str(random.randint(1, 255))
+            env['MALLOC_PERTURB_'] = str(secrets.SystemRandom().randint(1, 255))
 
         # Sanitizers do not default to aborting on error. This is counter to
         # expectations when using -Db_sanitize and has led to confusion in the wild
