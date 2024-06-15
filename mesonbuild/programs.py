@@ -174,7 +174,7 @@ class ExternalProgram(mesonlib.HoldableObject):
         """
         try:
             with open(script, encoding='utf-8') as f:
-                first_line = f.readline().strip()
+                first_line = f.readline(5_000_000).strip()
             if first_line.startswith('#!'):
                 # In a shebang, everything before the first space is assumed to
                 # be the command to run and everything after the first space is

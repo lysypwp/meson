@@ -8,7 +8,7 @@ import sys, os
 import subprocess
 
 with open(sys.argv[1]) as f:
-    funcname = f.readline().strip()
+    funcname = f.readline(5_000_000).strip()
 outdir = sys.argv[2]
 buildtype_args = sys.argv[3]
 compiler_type = sys.argv[4]

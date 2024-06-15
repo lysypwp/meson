@@ -205,7 +205,7 @@ class CudaDependency(SystemDependency):
         version_file_path = os.path.join(path, 'version.txt')
         try:
             with open(version_file_path, encoding='utf-8') as version_file:
-                version_str = version_file.readline() # e.g. 'CUDA Version 10.1.168'
+                version_str = version_file.readline(5_000_000) # e.g. 'CUDA Version 10.1.168'
                 m = self.toolkit_version_regex.match(version_str)
                 if m:
                     return self._strip_patch_version(m.group(1))
