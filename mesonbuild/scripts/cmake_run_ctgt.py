@@ -7,6 +7,7 @@ import shutil
 import sys
 from pathlib import Path
 import typing as T
+from security import safe_command
 
 def run(argsv: T.List[str]) -> int:
     commands: T.List[T.List[str]] = [[]]
@@ -66,7 +67,7 @@ def run(argsv: T.List[str]) -> int:
         try:
             directory.mkdir(parents=True, exist_ok=True)
 
-            res = subprocess.run(cmd, stdout=stdout, stderr=stderr, cwd=str(directory), check=True)
+            res = safe_command.run(subprocess.run, cmd, stdout=stdout, stderr=stderr, cwd=str(directory), check=True)
             if capture_file:
                 out_file = directory / capture_file
                 out_file.write_bytes(res.stdout)

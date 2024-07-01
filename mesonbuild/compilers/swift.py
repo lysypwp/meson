@@ -9,6 +9,7 @@ import typing as T
 from ..mesonlib import EnvironmentException
 
 from .compilers import Compiler, clike_debug_args
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from ..envconfig import MachineInfo
@@ -100,14 +101,14 @@ class SwiftCompiler(Compiler):
         with open(source_name, 'w', encoding='utf-8') as ofile:
             ofile.write('''print("Swift compilation is working.")
 ''')
-        pc = subprocess.Popen(self.exelist + extra_flags + ['-emit-executable', '-o', output_name, src], cwd=work_dir)
+        pc = safe_command.run(subprocess.Popen, self.exelist + extra_flags + ['-emit-executable', '-o', output_name, src], cwd=work_dir)
         pc.wait()
         if pc.returncode != 0:
             raise EnvironmentException('Swift compiler %s cannot compile programs.' % self.name_string())
         if self.is_cross:
             # Can't check if the binaries run so we have to assume they do
             return
-        if subprocess.call(output_name) != 0:
+        if safe_command.run(subprocess.call, output_name) != 0:
             raise EnvironmentException('Executables created by Swift compiler %s are not runnable.' % self.name_string())
 
     def get_debug_args(self, is_debug: bool) -> T.List[str]:

@@ -8,6 +8,7 @@ import sys
 import typing as T
 
 from mesonbuild.mesonlib import version_compare
+from security import safe_command
 
 modules = [
     # fully typed submodules
@@ -139,12 +140,12 @@ def main() -> int:
         command = [opts.mypy] if opts.mypy else [sys.executable, '-m', 'mypy']
         if not opts.quiet:
             print('Running mypy (this can take some time) ...')
-        retcode = subprocess.run(command + args + to_check + additional_to_check, cwd=root).returncode
+        retcode = safe_command.run(subprocess.run, command + args + to_check + additional_to_check, cwd=root).returncode
         if opts.allver and retcode == 0:
             for minor in range(7, sys.version_info[1]):
                 if not opts.quiet:
                     print(f'Checking mypy with python version: 3.{minor}')
-                p = subprocess.run(command + args + to_check + [f'--python-version=3.{minor}'], cwd=root)
+                p = safe_command.run(subprocess.run, command + args + to_check + [f'--python-version=3.{minor}'], cwd=root)
                 if p.returncode != 0:
                     retcode = p.returncode
         return retcode

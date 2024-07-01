@@ -13,6 +13,7 @@ from pathlib import Path
 import typing as T
 from ast import literal_eval
 import os
+from security import safe_command
 
 def scanbuild(exelist: T.List[str], srcdir: Path, blddir: Path, privdir: Path, logdir: Path, subprojdir: Path, args: T.List[str]) -> int:
     # In case of problems leave the temp directory around
@@ -20,10 +21,10 @@ def scanbuild(exelist: T.List[str], srcdir: Path, blddir: Path, privdir: Path, l
     scandir = tempfile.mkdtemp(dir=str(privdir))
     meson_cmd = exelist + args
     build_cmd = exelist + ['--exclude', str(subprojdir), '-o', str(logdir)] + detect_ninja() + ['-C', scandir]
-    rc = subprocess.call(meson_cmd + [str(srcdir), scandir])
+    rc = safe_command.run(subprocess.call, meson_cmd + [str(srcdir), scandir])
     if rc != 0:
         return rc
-    rc = subprocess.call(build_cmd)
+    rc = safe_command.run(subprocess.call, build_cmd)
     if rc == 0:
         windows_proof_rmtree(scandir)
     return rc

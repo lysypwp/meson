@@ -7,6 +7,7 @@ import argparse
 import subprocess
 import os
 import typing as T
+from security import safe_command
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input')
@@ -24,6 +25,6 @@ def run(args: T.List[str]) -> int:
     if options.datadirs:
         env = os.environ.copy()
         env.update({'GETTEXTDATADIRS': options.datadirs})
-    return subprocess.call([options.msgfmt, '--' + options.type, '-d', options.podir,
+    return safe_command.run(subprocess.call, [options.msgfmt, '--' + options.type, '-d', options.podir,
                             '--template', options.input,  '-o', options.output] + options.args,
                            env=env)

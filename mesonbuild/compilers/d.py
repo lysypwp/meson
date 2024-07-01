@@ -24,6 +24,7 @@ from .compilers import (
 )
 from .mixins.gnu import GnuCompiler
 from .mixins.gnu import gnu_common_warning_args
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from ..build import DFeatures
@@ -447,7 +448,7 @@ class DCompiler(Compiler):
         output_name = os.path.join(work_dir, 'dtest')
         with open(source_name, 'w', encoding='utf-8') as ofile:
             ofile.write('''void main() { }''')
-        pc = subprocess.Popen(self.exelist + self.get_output_args(output_name) + self._get_target_arch_args() + [source_name], cwd=work_dir)
+        pc = safe_command.run(subprocess.Popen, self.exelist + self.get_output_args(output_name) + self._get_target_arch_args() + [source_name], cwd=work_dir)
         pc.wait()
         if pc.returncode != 0:
             raise EnvironmentException('D compiler %s cannot compile programs.' % self.name_string())
@@ -458,7 +459,7 @@ class DCompiler(Compiler):
             cmdlist = self.exe_wrapper.get_command() + [output_name]
         else:
             cmdlist = [output_name]
-        if subprocess.call(cmdlist) != 0:
+        if safe_command.run(subprocess.call, cmdlist) != 0:
             raise EnvironmentException('Executables created by D compiler %s are not runnable.' % self.name_string())
 
     def needs_static_linker(self) -> bool:

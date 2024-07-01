@@ -32,6 +32,7 @@ from run_tests import (
     get_builddir_target_args, get_meson_script, run_configure_inprocess,
     run_mtest_inprocess, handle_meson_skip_test,
 )
+from security import safe_command
 
 
 # magic attribute used by unittest.result.TestResult._is_relevant_tb_level
@@ -160,7 +161,7 @@ class BasePlatformTests(TestCase):
             env = os.environ.copy()
             env.update(override_envvars)
 
-        proc = subprocess.run(command, stdout=subprocess.PIPE,
+        proc = safe_command.run(subprocess.run, command, stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT if stderr else subprocess.PIPE,
                               env=env,
                               encoding='utf-8',
