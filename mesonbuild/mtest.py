@@ -16,7 +16,6 @@ import enum
 import json
 import multiprocessing
 import os
-import pickle
 import platform
 import random
 import re
@@ -40,6 +39,7 @@ from .mesonlib import (MesonException, OptionKey, OrderedSet, RealPathAction,
 from .mintro import get_infodir, load_info_file
 from .programs import ExternalProgram
 from .backend.backends import TestProtocol, TestSerialisation
+import fickling
 
 if T.TYPE_CHECKING:
     TYPE_TAPResult = T.Union['TAPParser.Test',
@@ -1654,7 +1654,7 @@ class TestHarness:
         if not datafile.is_file():
             raise TestException(f'Directory {self.options.wd!r} does not seem to be a Meson build directory.')
         with datafile.open('rb') as f:
-            objs = check_testdata(pickle.load(f))
+            objs = check_testdata(fickling.load(f))
         return objs
 
     def __enter__(self) -> 'TestHarness':
