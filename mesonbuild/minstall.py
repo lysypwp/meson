@@ -21,6 +21,8 @@ from .mesonlib import (MesonException, Popen_safe, RealPathAction, is_windows,
                        is_aix, setup_vsenv, pickle_load, is_osx, OptionKey)
 from .scripts import depfixer, destdir_join
 from .scripts.meson_exe import run_exe
+from security import safe_command
+
 try:
     from __main__ import __file__ as main_file
 except ImportError:
@@ -829,7 +831,7 @@ def rebuild_all(wd: str, backend: str) -> bool:
             return None, None
 
     env, preexec_fn = drop_privileges()
-    ret = subprocess.run(ninja + ['-C', wd], env=env, preexec_fn=preexec_fn).returncode
+    ret = safe_command.run(subprocess.run, ninja + ['-C', wd], env=env, preexec_fn=preexec_fn).returncode
     if ret != 0:
         print(f'Could not rebuild {wd}')
         return False

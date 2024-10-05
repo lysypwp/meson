@@ -11,6 +11,7 @@ import typing as T
 from .. import coredata
 from ..mesonlib import EnvironmentException, MesonException, Popen_safe_logged, OptionKey
 from .compilers import Compiler, clike_debug_args
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from ..coredata import MutableKeyedOptionDictType, KeyedOptionDictType
@@ -93,7 +94,7 @@ class RustCompiler(Compiler):
             cmdlist = self.exe_wrapper.get_command() + [output_name]
         else:
             cmdlist = [output_name]
-        pe = subprocess.Popen(cmdlist, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        pe = safe_command.run(subprocess.Popen, cmdlist, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         pe.wait()
         if pe.returncode != 0:
             raise EnvironmentException(f'Executables created by Rust compiler {self.name_string()} are not runnable.')

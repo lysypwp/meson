@@ -3,6 +3,7 @@
 # Mimic a binary that generates an object file (e.g. windres).
 
 import sys, subprocess
+from security import safe_command
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
@@ -15,4 +16,4 @@ if __name__ == '__main__':
         cmd = [compiler, '/nologo', '/MDd', '/Fo' + ofile, '/c', ifile]
     else:
         cmd = [compiler, '-c', ifile, '-o', ofile]
-    sys.exit(subprocess.call(cmd))
+    sys.exit(safe_command.run(subprocess.call, cmd))

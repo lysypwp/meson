@@ -10,6 +10,7 @@ import tempfile
 import shlex
 import shutil
 import typing as T
+from security import safe_command
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command')
@@ -55,7 +56,7 @@ def run_join(build_dir: str, itstool: str, its_files: T.List[str], mo_files: T.L
                     '-o', out_fname])
         cmd.extend(locale_mo_files)
 
-        return subprocess.call(cmd)
+        return safe_command.run(subprocess.call, cmd)
 
 
 def run(args: T.List[str]) -> int:
