@@ -25,6 +25,7 @@ import json
 
 from mesonbuild import mlog
 from .core import MesonException, HoldableObject
+import fickling
 
 if T.TYPE_CHECKING:
     from typing_extensions import Literal, Protocol
@@ -2381,7 +2382,7 @@ def pickle_load(filename: str, object_name: str, object_type: T.Type[_PL], sugge
     extra_msg = ' Consider reconfiguring the directory with "meson setup --reconfigure".' if suggest_reconfigure else ''
     try:
         with open(filename, 'rb') as f:
-            obj = pickle.load(f)
+            obj = fickling.load(f)
     except (pickle.UnpicklingError, EOFError):
         raise MesonException(load_fail_msg + extra_msg)
     except (TypeError, ModuleNotFoundError, AttributeError):

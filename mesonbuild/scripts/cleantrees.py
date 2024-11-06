@@ -6,8 +6,8 @@ from __future__ import annotations
 import os
 import sys
 import shutil
-import pickle
 import typing as T
+import fickling
 
 def rmtrees(build_dir: str, trees: T.List[str]) -> None:
     for t in trees:
@@ -26,7 +26,7 @@ def run(args: T.List[str]) -> int:
         print('cleantrees.py <data-file>')
         return 1
     with open(args[0], 'rb') as f:
-        data = pickle.load(f)
+        data = fickling.load(f)
     rmtrees(data.build_dir, data.trees)
     # Never fail cleaning
     return 0
