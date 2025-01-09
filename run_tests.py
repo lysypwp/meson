@@ -5,6 +5,8 @@
 # Work around some pathlib bugs...
 from mesonbuild import _pathlib
 import sys
+from security import safe_command
+
 sys.modules['pathlib'] = _pathlib
 
 import collections
@@ -343,7 +345,7 @@ def print_system_info():
 
 def subprocess_call(cmd, **kwargs):
     print(f'$ {mesonlib.join_args(cmd)}')
-    return subprocess.call(cmd, **kwargs)
+    return safe_command.run(subprocess.call, cmd, **kwargs)
 
 def main():
     print_system_info()

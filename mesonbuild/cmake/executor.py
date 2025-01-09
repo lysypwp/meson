@@ -12,6 +12,7 @@ import os
 from .. import mlog
 from ..mesonlib import PerMachine, Popen_safe, version_compare, is_windows, OptionKey
 from ..programs import find_external_program, NonExistingExternalProgram
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from pathlib import Path
@@ -132,7 +133,7 @@ class CMakeExecutor:
 
     def _call_cmout_stderr(self, args: T.List[str], build_dir: Path, env: T.Optional[T.Dict[str, str]]) -> TYPE_result:
         cmd = self.cmakebin.get_command() + args
-        proc = S.Popen(cmd, stdout=S.PIPE, stderr=S.PIPE, cwd=str(build_dir), env=env)  # TODO [PYTHON_37]: drop Path conversion
+        proc = safe_command.run(S.Popen, cmd, stdout=S.PIPE, stderr=S.PIPE, cwd=str(build_dir), env=env)  # TODO [PYTHON_37]: drop Path conversion
 
         # stdout and stderr MUST be read at the same time to avoid pipe
         # blocking issues. The easiest way to do this is with a separate
@@ -175,7 +176,7 @@ class CMakeExecutor:
 
     def _call_cmout(self, args: T.List[str], build_dir: Path, env: T.Optional[T.Dict[str, str]]) -> TYPE_result:
         cmd = self.cmakebin.get_command() + args
-        proc = S.Popen(cmd, stdout=S.PIPE, stderr=S.STDOUT, cwd=str(build_dir), env=env)  # TODO [PYTHON_37]: drop Path conversion
+        proc = safe_command.run(S.Popen, cmd, stdout=S.PIPE, stderr=S.STDOUT, cwd=str(build_dir), env=env)  # TODO [PYTHON_37]: drop Path conversion
         while True:
             line = proc.stdout.readline()
             if not line:
@@ -188,7 +189,7 @@ class CMakeExecutor:
     def _call_quiet(self, args: T.List[str], build_dir: Path, env: T.Optional[T.Dict[str, str]]) -> TYPE_result:
         build_dir.mkdir(parents=True, exist_ok=True)
         cmd = self.cmakebin.get_command() + args
-        ret = S.run(cmd, env=env, cwd=str(build_dir), close_fds=False,
+        ret = safe_command.run(S.run, cmd, env=env, cwd=str(build_dir), close_fds=False,
                     stdout=S.PIPE, stderr=S.PIPE, universal_newlines=False)   # TODO [PYTHON_37]: drop Path conversion
         rc = ret.returncode
         out = ret.stdout.decode(errors='ignore')

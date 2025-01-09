@@ -5,6 +5,8 @@
 # Work around some pathlib bugs...
 from mesonbuild import _pathlib
 import sys
+from security import safe_command
+
 sys.modules['pathlib'] = _pathlib
 
 import time
@@ -134,7 +136,7 @@ def main():
             pytest_args += ['-p' 'no:cov']
         except ImportError:
             pass
-        return subprocess.run(python_command + ['-m', 'pytest'] + pytest_args).returncode
+        return safe_command.run(subprocess.run, python_command + ['-m', 'pytest'] + pytest_args).returncode
     except ImportError:
         print('pytest not found, using unittest instead')
     # Fallback to plain unittest.

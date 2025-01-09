@@ -40,6 +40,7 @@ from .mesonlib import (MesonException, OptionKey, OrderedSet, RealPathAction,
 from .mintro import get_infodir, load_info_file
 from .programs import ExternalProgram
 from .backend.backends import TestProtocol, TestSerialisation
+from security import safe_command
 
 if T.TYPE_CHECKING:
     TYPE_TAPResult = T.Union['TAPParser.Test',
@@ -1632,10 +1633,10 @@ class TestHarness:
             # happen before rebuild_deps(), because we need the correct list of
             # tests and their dependencies to compute
             if not self.options.no_rebuild:
-                teststdo = subprocess.run(self.ninja + ['-n', 'build.ninja'], capture_output=True).stdout
+                teststdo = safe_command.run(subprocess.run, self.ninja + ['-n', 'build.ninja'], capture_output=True).stdout
                 if b'ninja: no work to do.' not in teststdo and b'samu: nothing to do' not in teststdo:
                     stdo = sys.stderr if self.options.list else sys.stdout
-                    ret = subprocess.run(self.ninja + ['build.ninja'], stdout=stdo.fileno())
+                    ret = safe_command.run(subprocess.run, self.ninja + ['build.ninja'], stdout=stdo.fileno())
                     if ret.returncode != 0:
                         raise TestException(f'Could not configure {self.options.wd!r}')
 
@@ -2128,7 +2129,7 @@ def rebuild_deps(ninja: T.List[str], wd: str, tests: T.List[TestSerialisation]) 
             depends.update(d)
             targets.update(intro_targets[d])
 
-    ret = subprocess.run(ninja + ['-C', wd] + sorted(targets)).returncode
+    ret = safe_command.run(subprocess.run, ninja + ['-C', wd] + sorted(targets)).returncode
     if ret != 0:
         print(f'Could not rebuild {wd}')
         return False

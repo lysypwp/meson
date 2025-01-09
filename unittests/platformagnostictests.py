@@ -16,6 +16,7 @@ from .helpers import is_ci
 from mesonbuild.mesonlib import EnvironmentVariables, ExecutableSerialisation, is_linux, python_command
 from mesonbuild.optinterpreter import OptionInterpreter, OptionException
 from run_tests import Backend
+from security import safe_command
 
 @skipIf(is_ci() and not is_linux(), "Run only on fast platforms")
 class PlatformAgnosticTests(BasePlatformTests):
@@ -212,7 +213,7 @@ class PlatformAgnosticTests(BasePlatformTests):
         with p.open('wb') as f:
             pickle.dump(es, f)
         cmd = self.meson_command + ['--internal', 'test_loaded_modules', '--unpickle', str(p)]
-        p = subprocess.run(cmd, stdout=subprocess.PIPE)
+        p = safe_command.run(subprocess.run, cmd, stdout=subprocess.PIPE)
         all_modules = json.loads(p.stdout.splitlines()[0])
         meson_modules = [m for m in all_modules if m.startswith('mesonbuild')]
         expected_meson_modules = [

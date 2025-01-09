@@ -13,6 +13,7 @@ import typing as T
 from ..mesonlib import EnvironmentException
 from .compilers import Compiler
 from .mixins.islinker import BasicLinkerIsCompilerMixin
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from ..envconfig import MachineInfo
@@ -84,14 +85,14 @@ class JavaCompiler(BasicLinkerIsCompilerMixin, Compiler):
                   }
                 }
                 '''))
-        pc = subprocess.Popen(self.exelist + [src], cwd=work_dir)
+        pc = safe_command.run(subprocess.Popen, self.exelist + [src], cwd=work_dir)
         pc.wait()
         if pc.returncode != 0:
             raise EnvironmentException(f'Java compiler {self.name_string()} cannot compile programs.')
         runner = shutil.which(self.javarunner)
         if runner:
             cmdlist = [runner, '-cp', '.', obj]
-            pe = subprocess.Popen(cmdlist, cwd=work_dir)
+            pe = safe_command.run(subprocess.Popen, cmdlist, cwd=work_dir)
             pe.wait()
             if pe.returncode != 0:
                 raise EnvironmentException(f'Executables created by Java compiler {self.name_string()} are not runnable.')

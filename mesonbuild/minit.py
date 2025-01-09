@@ -20,6 +20,7 @@ from mesonbuild.coredata import FORBIDDEN_TARGET_NAMES
 from mesonbuild.environment import detect_ninja
 from mesonbuild.templates.mesontemplates import create_meson_build
 from mesonbuild.templates.samplefactory import sample_generator
+from security import safe_command
 
 if T.TYPE_CHECKING:
     import argparse
@@ -187,7 +188,7 @@ def run(options: Arguments) -> int:
             shutil.rmtree(options.builddir)
         print('Building...')
         cmd = mesonlib.get_meson_command() + ['setup', options.builddir]
-        ret = subprocess.run(cmd)
+        ret = safe_command.run(subprocess.run, cmd)
         if ret.returncode:
             raise SystemExit
 
@@ -198,7 +199,7 @@ def run(options: Arguments) -> int:
             mlog.log(mlog.green('INFO:'), 'automatically activated MSVC compiler environment')
 
         cmd = detect_ninja() + ['-C', options.builddir]
-        ret = subprocess.run(cmd)
+        ret = safe_command.run(subprocess.run, cmd)
         if ret.returncode:
             raise SystemExit
     return 0

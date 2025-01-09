@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess, sys, platform
+from security import safe_command
 
 # Meson does not yet support Studio cc on Solaris, only gcc or clang
 if platform.system() == 'SunOS':
@@ -8,4 +9,4 @@ if platform.system() == 'SunOS':
 else:
     cc = 'cc'
 
-subprocess.call([cc, "-DEXTERNAL_HOST"] + sys.argv[1:])
+safe_command.run(subprocess.call, [cc, "-DEXTERNAL_HOST"] + sys.argv[1:])

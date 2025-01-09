@@ -14,6 +14,7 @@ from mesonbuild.coredata import version as meson_version
 from pathlib import Path
 import json
 import os
+from security import safe_command
 
 
 def runtests(cross_file, failfast, cross_only, test_list, env=None):
@@ -27,7 +28,7 @@ def runtests(cross_file, failfast, cross_only, test_list, env=None):
     cmd += ['--cross-file', cross_file]
     if cross_only:
         cmd += ['--native-file', 'cross/none.txt']
-    return subprocess.call(cmd, env=env)
+    return safe_command.run(subprocess.call, cmd, env=env)
 
 def main():
     parser = argparse.ArgumentParser()

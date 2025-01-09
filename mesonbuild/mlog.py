@@ -20,6 +20,7 @@ import typing as T
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from ._typing import StringProtocol, SizedStringProtocol
@@ -166,7 +167,7 @@ class _Logger:
             # Set "-c" for lv to support color
             if 'LV' not in env:
                 env['LV'] = '-c'
-            self.log_pager = subprocess.Popen(pager_cmd, stdin=subprocess.PIPE,
+            self.log_pager = safe_command.run(subprocess.Popen, pager_cmd, stdin=subprocess.PIPE,
                                               text=True, encoding='utf-8', env=env)
         except Exception as e:
             # Ignore errors, unless it is a user defined pager.

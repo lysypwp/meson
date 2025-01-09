@@ -7,6 +7,7 @@ import os
 import argparse
 import subprocess
 import typing as T
+from security import safe_command
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command')
@@ -50,7 +51,7 @@ def run_potgen(src_sub: str, xgettext: str, pkgname: str, datadirs: str, args: T
         child_env['GETTEXTDATADIRS'] = datadirs
 
     ofile = os.path.join(src_sub, pkgname + '.pot')
-    return subprocess.call([xgettext, '--package-name=' + pkgname, '-p', src_sub, '-f', listfile,
+    return safe_command.run(subprocess.call, [xgettext, '--package-name=' + pkgname, '-p', src_sub, '-f', listfile,
                             '-D', source_root, '-k_', '-o', ofile] + args,
                            env=child_env)
 

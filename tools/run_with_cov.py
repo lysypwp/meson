@@ -7,6 +7,7 @@ import coverage
 import os
 import sys
 from pathlib import Path
+from security import safe_command
 
 root_path = Path(__file__).parent.parent.absolute()
 
@@ -36,7 +37,7 @@ def main() -> int:
 
     # Run the actual command
     cmd = mesonlib.python_command + sys.argv[1:]
-    return subprocess.run(cmd, env=os.environ.copy()).returncode
+    return safe_command.run(subprocess.run, cmd, env=os.environ.copy()).returncode
 
 if __name__ == '__main__':
     raise SystemExit(main())

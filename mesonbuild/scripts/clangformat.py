@@ -12,6 +12,7 @@ from ..environment import detect_clangformat
 from ..mesonlib import version_compare
 from ..programs import ExternalProgram
 import typing as T
+from security import safe_command
 
 def run_clang_format(fname: Path, exelist: T.List[str], check: bool, cformat_ver: T.Optional[str]) -> subprocess.CompletedProcess:
     clangformat_10 = False
@@ -22,7 +23,7 @@ def run_clang_format(fname: Path, exelist: T.List[str], check: bool, cformat_ver
         else:
             original = fname.read_bytes()
     before = fname.stat().st_mtime
-    ret = subprocess.run(exelist + ['-style=file', '-i', str(fname)])
+    ret = safe_command.run(subprocess.run, exelist + ['-style=file', '-i', str(fname)])
     after = fname.stat().st_mtime
     if before != after:
         print('File reformatted: ', fname)

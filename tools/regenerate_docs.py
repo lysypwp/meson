@@ -16,13 +16,14 @@ import json
 import typing as T
 from pathlib import Path
 from urllib.request import urlopen
+from security import safe_command
 
 PathLike = T.Union[Path,str]
 
 def _get_meson_output(root_dir: Path, args: T.List) -> str:
     env = os.environ.copy()
     env['COLUMNS'] = '80'
-    return subprocess.run([str(sys.executable), str(root_dir/'meson.py')] + args, check=True, capture_output=True, text=True, env=env).stdout.strip()
+    return safe_command.run(subprocess.run, [str(sys.executable), str(root_dir/'meson.py')] + args, check=True, capture_output=True, text=True, env=env).stdout.strip()
 
 def get_commands(help_output: str) -> T.Set[str]:
     # Python's argument parser might put the command list to its own line. Or it might not.

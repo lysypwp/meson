@@ -8,6 +8,7 @@ from . import destdir_join
 
 import argparse
 import typing as T
+from security import safe_command
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--install')
@@ -26,7 +27,7 @@ def run(argv: T.List[str]) -> int:
     paths = [val] if val else []
     subenv['PYTHONPATH'] = os.pathsep.join(paths + options.extra_extension_path)
 
-    res = subprocess.call(args, cwd=options.builddir, env=subenv)
+    res = safe_command.run(subprocess.call, args, cwd=options.builddir, env=subenv)
     if res != 0:
         return res
 
