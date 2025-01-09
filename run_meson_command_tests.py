@@ -12,6 +12,7 @@ from pathlib import Path
 
 from mesonbuild.mesonlib import windows_proof_rmtree, python_command, is_windows
 from mesonbuild.coredata import version as meson_version
+from security import safe_command
 
 scheme = None
 
@@ -79,7 +80,7 @@ class CommandTests(unittest.TestCase):
         # If this call hangs CI will just abort. It is very hard to distinguish
         # between CI issue and test bug in that case. Set timeout and fail loud
         # instead.
-        p = subprocess.run(command, stdout=subprocess.PIPE,
+        p = safe_command.run(subprocess.run, command, stdout=subprocess.PIPE,
                            env=env, text=True,
                            cwd=workdir, timeout=60 * 5)
         print(p.stdout)

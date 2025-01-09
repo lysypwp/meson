@@ -12,6 +12,7 @@ from . import build, minstall
 from .mesonlib import (EnvironmentVariables, MesonException, is_windows, setup_vsenv, OptionKey,
                        get_wine_shortpath, MachineChoice)
 from . import mlog
+from security import safe_command
 
 
 if T.TYPE_CHECKING:
@@ -225,7 +226,7 @@ def run(options: argparse.Namespace) -> int:
         args[0] = abs_path or args[0]
 
     try:
-        return subprocess.call(args, close_fds=False,
+        return safe_command.run(subprocess.call, args, close_fds=False,
                                env=devenv,
                                cwd=workdir)
     except subprocess.CalledProcessError as e:

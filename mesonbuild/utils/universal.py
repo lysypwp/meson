@@ -25,6 +25,7 @@ import json
 
 from mesonbuild import mlog
 from .core import MesonException, HoldableObject
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from typing_extensions import Literal, Protocol
@@ -680,7 +681,7 @@ def is_aix() -> bool:
 
 def exe_exists(arglist: T.List[str]) -> bool:
     try:
-        if subprocess.run(arglist, timeout=10).returncode == 0:
+        if safe_command.run(subprocess.run, arglist, timeout=10).returncode == 0:
             return True
     except (FileNotFoundError, subprocess.TimeoutExpired):
         pass
@@ -1515,7 +1516,7 @@ def Popen_safe(args: T.List[str], write: T.Optional[str] = None,
         if not sys.stdout.encoding or encoding.upper() != 'UTF-8':
             p, o, e = Popen_safe_legacy(args, write=write, stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
         else:
-            p = subprocess.Popen(args, universal_newlines=True, encoding=encoding, close_fds=False,
+            p = safe_command.run(subprocess.Popen, args, universal_newlines=True, encoding=encoding, close_fds=False,
                                  stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
             o, e = p.communicate(write)
     except OSError as oserr:
@@ -1535,7 +1536,7 @@ def Popen_safe_legacy(args: T.List[str], write: T.Optional[str] = None,
                       stdout: T.Union[T.TextIO, T.BinaryIO, int] = subprocess.PIPE,
                       stderr: T.Union[T.TextIO, T.BinaryIO, int] = subprocess.PIPE,
                       **kwargs: T.Any) -> T.Tuple['subprocess.Popen[str]', str, str]:
-    p = subprocess.Popen(args, universal_newlines=False, close_fds=False,
+    p = safe_command.run(subprocess.Popen, args, universal_newlines=False, close_fds=False,
                          stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
     input_: T.Optional[bytes] = None
     if write is not None:

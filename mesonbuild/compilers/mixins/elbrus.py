@@ -2,6 +2,7 @@
 # Copyright © 2023 Intel Corporation
 
 from __future__ import annotations
+from security import safe_command
 
 """Abstractions for the Elbrus family of compilers."""
 
@@ -64,7 +65,7 @@ class ElbrusCompiler(GnuLikeCompiler):
     def get_default_include_dirs(self) -> T.List[str]:
         os_env = os.environ.copy()
         os_env['LC_ALL'] = 'C'
-        p = subprocess.Popen(self.get_exelist(ccache=False) + ['-xc', '-E', '-v', '-'], env=os_env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = safe_command.run(subprocess.Popen, self.get_exelist(ccache=False) + ['-xc', '-E', '-v', '-'], env=os_env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stderr = p.stderr.read().decode('utf-8', errors='replace')
         includes: T.List[str] = []
         for line in stderr.split('\n'):

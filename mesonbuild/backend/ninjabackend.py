@@ -34,6 +34,7 @@ from ..mesonlib import (
 from ..mesonlib import get_compiler_for_source, has_path_sep, OptionKey
 from .backends import CleanTrees
 from ..build import GeneratedList, InvalidArguments
+from security import safe_command
 
 if T.TYPE_CHECKING:
     from typing_extensions import Literal
@@ -531,7 +532,7 @@ class NinjaBackend(backends.Backend):
         # and locale dependent. Any attempt at converting it to
         # Python strings leads to failure. We _must_ do this detection
         # in raw byte mode and write the result in raw bytes.
-        pc = subprocess.Popen(compiler.get_exelist() +
+        pc = safe_command.run(subprocess.Popen, compiler.get_exelist() +
                               ['/showIncludes', '/c', filebase],
                               cwd=self.environment.get_scratch_dir(),
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -657,8 +658,8 @@ class NinjaBackend(backends.Backend):
         mlog.cmd_ci_include(outfilename)  # For CI debugging
         # Refresh Ninja's caches. https://github.com/ninja-build/ninja/pull/1685
         if mesonlib.version_compare(self.ninja_version, '>=1.10.0') and os.path.exists(os.path.join(self.environment.build_dir, '.ninja_log')):
-            subprocess.call(self.ninja_command + ['-t', 'restat'], cwd=self.environment.build_dir)
-            subprocess.call(self.ninja_command + ['-t', 'cleandead'], cwd=self.environment.build_dir)
+            safe_command.run(subprocess.call, self.ninja_command + ['-t', 'restat'], cwd=self.environment.build_dir)
+            safe_command.run(subprocess.call, self.ninja_command + ['-t', 'cleandead'], cwd=self.environment.build_dir)
         self.generate_compdb()
         self.generate_rust_project_json()
 
