@@ -6,13 +6,13 @@ from __future__ import annotations
 import json
 import os
 import pathlib
-import pickle
 import re
 import sys
 import typing as T
 
 from ..backend.ninjabackend import ninja_quote
 from ..compilers.compilers import lang_suffixes
+import fickling
 
 if T.TYPE_CHECKING:
     from ..backend.ninjabackend import TargetDependencyScannerInfo
@@ -32,7 +32,7 @@ FORTRAN_USE_RE = re.compile(FORTRAN_USE_PAT, re.IGNORECASE)
 class DependencyScanner:
     def __init__(self, pickle_file: str, outfile: str, sources: T.List[str]):
         with open(pickle_file, 'rb') as pf:
-            self.target_data: TargetDependencyScannerInfo = pickle.load(pf)
+            self.target_data: TargetDependencyScannerInfo = fickling.load(pf)
         self.outfile = outfile
         self.sources = sources
         self.provided_by: T.Dict[str, str] = {}
