@@ -12,6 +12,6 @@ int %s(void) {
 }
 '''
 
-funname = open(ifile).readline().strip()
+funname = open(ifile).readline(5_000_000).strip()
 
 open(ofile, 'w').write(templ % funname)

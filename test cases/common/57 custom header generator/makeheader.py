@@ -7,6 +7,6 @@ import sys
 
 template = '#define RET_VAL %s\n'
 with open(sys.argv[1]) as f:
-    output = template % (f.readline().strip(), )
+    output = template % (f.readline(5_000_000).strip(), )
 with open(sys.argv[2], 'w') as f:
     f.write(output)

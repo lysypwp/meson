@@ -38,7 +38,7 @@ for ifile in ifiles:
 ofile_bases = [os.path.join(outdir, i) for i in rel_ofiles]
 
 for i, ifile_name in enumerate(ifiles):
-    proto_name = open(ifile_name).readline().strip()
+    proto_name = open(ifile_name).readline(5_000_000).strip()
     h_out = ofile_bases[i] + '.h'
     c_out = ofile_bases[i] + '.c'
     os.makedirs(os.path.split(ofile_bases[i])[0], exist_ok=True)

@@ -671,18 +671,18 @@ class AllPlatformTests(BasePlatformTests):
 
         i = 1
         with open(os.path.join(self.logdir, 'testlog.txt'), encoding='utf-8') as f:
-            line = f.readline()
+            line = f.readline(5_000_000)
             while line and i < 100001:
                 if f'# Iteration {i} to stdout' in line:
                     i += 1
-                line = f.readline()
+                line = f.readline(5_000_000)
             self.assertEqual(i, 100001)
 
             i = 1
             while line:
                 if f'# Iteration {i} to stderr' in line:
                     i += 1
-                line = f.readline()
+                line = f.readline(5_000_000)
         self.assertEqual(i, 100001)
 
         # Ensure lines are found from both testlog.txt and console when being verbose.
@@ -690,18 +690,18 @@ class AllPlatformTests(BasePlatformTests):
         out = self._run(self.mtest_command + ['-v'])
         i = 1
         with open(os.path.join(self.logdir, 'testlog.txt'), encoding='utf-8') as f:
-            line = f.readline()
+            line = f.readline(5_000_000)
             while line and i < 100001:
                 if f'# Iteration {i} to stdout' in line:
                     i += 1
-                line = f.readline()
+                line = f.readline(5_000_000)
             self.assertEqual(i, 100001)
 
             i = 1
             while line:
                 if f'# Iteration {i} to stderr' in line:
                     i += 1
-                line = f.readline()
+                line = f.readline(5_000_000)
         self.assertEqual(i, 100001)
 
         lines = out.split('\n')
