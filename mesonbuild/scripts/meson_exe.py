@@ -12,6 +12,7 @@ import typing as T
 import locale
 
 from ..utils.core import ExecutableSerialisation
+from security import safe_command
 
 def buildparser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Custom executable wrapper for Meson. Do not run on your own, mmm\'kay?')
@@ -53,7 +54,7 @@ def run_exe(exe: ExecutableSerialisation, extra_env: T.Optional[T.Dict[str, str]
         assert not exe.capture, 'Cannot capture and print to console at the same time'
         pipe = None
 
-    p = subprocess.Popen(cmd_args, env=child_env, cwd=exe.workdir,
+    p = safe_command.run(subprocess.Popen, cmd_args, env=child_env, cwd=exe.workdir,
                          close_fds=False, stdin=stdin, stdout=pipe, stderr=pipe)
     stdout, stderr = p.communicate()
 

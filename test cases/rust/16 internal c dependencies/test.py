@@ -3,6 +3,7 @@
 import argparse
 import subprocess
 import sys
+from security import safe_command
 
 
 def main() -> None:
@@ -11,7 +12,7 @@ def main() -> None:
     parser.add_argument('expected')
     args = parser.parse_args()
 
-    out = subprocess.run(args.command, stdout=subprocess.PIPE)
+    out = safe_command.run(subprocess.run, args.command, stdout=subprocess.PIPE)
     actual = out.stdout.decode().strip()
 
     if args.expected != actual:

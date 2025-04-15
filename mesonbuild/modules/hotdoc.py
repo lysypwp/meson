@@ -2,6 +2,7 @@
 # Copyright 2018 The Meson development team
 
 from __future__ import annotations
+from security import safe_command
 
 '''This module provides helper functions for generating documentation using hotdoc'''
 
@@ -58,7 +59,7 @@ file_types = (str, File, CustomTarget, CustomTargetIndex)
 
 class HotdocExternalProgram(ExternalProgram):
     def run_hotdoc(self, cmd: T.List[str]) -> int:
-        return subprocess.run(self.get_command() + cmd, stdout=subprocess.DEVNULL).returncode
+        return safe_command.run(subprocess.run, self.get_command() + cmd, stdout=subprocess.DEVNULL).returncode
 
 
 class HotdocTargetBuilder:

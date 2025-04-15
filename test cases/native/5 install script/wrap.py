@@ -2,5 +2,6 @@
 
 import subprocess
 import sys
+from security import safe_command
 
-subprocess.run(sys.argv[1:])
+safe_command.run(subprocess.run, sys.argv[1:])

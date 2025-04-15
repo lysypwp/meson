@@ -2,6 +2,7 @@
 # Copyright 2015-2016 The Meson development team
 
 from __future__ import annotations
+from security import safe_command
 
 '''CD into dir given as first argument and execute
 the command given in the rest of the arguments.'''
@@ -14,7 +15,7 @@ def run(args: T.List[str]) -> int:
     command = args[1:]
 
     os.chdir(dirname)
-    return subprocess.call(command)
+    return safe_command.run(subprocess.call, command)
 
 if __name__ == '__main__':
     sys.exit(run(sys.argv[1:]))
