@@ -60,6 +60,7 @@ from run_tests import (
 
 from .baseplatformtests import BasePlatformTests
 from .helpers import *
+import fickling
 
 @contextmanager
 def temp_filename():
@@ -2819,7 +2820,7 @@ class AllPlatformTests(BasePlatformTests):
         # Set an older version to force a reconfigure from scratch
         filename = os.path.join(self.privatedir, 'coredata.dat')
         with open(filename, 'rb') as f:
-            obj = pickle.load(f)
+            obj = fickling.load(f)
         obj.version = '0.47.0'
         with open(filename, 'wb') as f:
             pickle.dump(obj, f)
