@@ -19,7 +19,7 @@ c_templ = '''int %s(void) {
 options = parser.parse_args(sys.argv[1:])
 
 with open(options.input) as f:
-    funcname = f.readline().strip()
+    funcname = f.readline(5_000_000).strip()
 if options.upper:
     funcname = funcname.upper()
 

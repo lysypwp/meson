@@ -6,7 +6,7 @@ ifile = sys.argv[1]
 ofile = sys.argv[2]
 
 with open(ifile) as f:
-    resval = f.readline().strip()
+    resval = f.readline(5_000_000).strip()
 
 templ = '#define RESULT (%s)\n'
 with open(ofile, 'w') as f:
