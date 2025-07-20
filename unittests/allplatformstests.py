@@ -60,6 +60,7 @@ from run_tests import (
 
 from .baseplatformtests import BasePlatformTests
 from .helpers import *
+from security import safe_command
 
 @contextmanager
 def temp_filename():
@@ -2158,10 +2159,10 @@ class AllPlatformTests(BasePlatformTests):
                               stdout=subprocess.DEVNULL)
         self.assertTrue(os.path.isdir(s3dir))
         self.assertFalse(os.path.isdir(scommondir))
-        self.assertNotEqual(subprocess.call(self.wrap_command + ['promote', 'scommon'],
+        self.assertNotEqual(safe_command.run(subprocess.call, self.wrap_command + ['promote', 'scommon'],
                                             cwd=workdir,
                                             stderr=subprocess.DEVNULL), 0)
-        self.assertNotEqual(subprocess.call(self.wrap_command + ['promote', 'invalid/path/to/scommon'],
+        self.assertNotEqual(safe_command.run(subprocess.call, self.wrap_command + ['promote', 'invalid/path/to/scommon'],
                                             cwd=workdir,
                                             stderr=subprocess.DEVNULL), 0)
         self.assertFalse(os.path.isdir(scommondir))
@@ -2182,7 +2183,7 @@ class AllPlatformTests(BasePlatformTests):
         spdir = os.path.join(workdir, 'subprojects')
 
         ambiguous_wrap = os.path.join(spdir, 'ambiguous.wrap')
-        self.assertNotEqual(subprocess.call(self.wrap_command + ['promote', 'ambiguous'],
+        self.assertNotEqual(safe_command.run(subprocess.call, self.wrap_command + ['promote', 'ambiguous'],
                                             cwd=workdir,
                                             stderr=subprocess.DEVNULL), 0)
         self.assertFalse(os.path.isfile(ambiguous_wrap))
@@ -2725,13 +2726,13 @@ class AllPlatformTests(BasePlatformTests):
                 of = open(mfile, 'w', encoding='utf-8')
                 of.write("project('foobar', 'c')\n")
                 of.close()
-                pc = subprocess.run(self.setup_command,
+                pc = safe_command.run(subprocess.run, self.setup_command,
                                     cwd=srcdir,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.DEVNULL)
                 self.assertIn(b'Must specify at least one directory name', pc.stdout)
                 with tempfile.TemporaryDirectory(dir=srcdir) as builddir:
-                    subprocess.run(self.setup_command,
+                    safe_command.run(subprocess.run, self.setup_command,
                                    check=True,
                                    cwd=builddir,
                                    stdout=subprocess.DEVNULL,

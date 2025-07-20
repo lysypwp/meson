@@ -2,6 +2,7 @@
 # Copyright 2012-2023 The Meson development team
 
 from __future__ import annotations
+from security import safe_command
 
 
 """Mixin classes to be shared between C and C++ compilers.
@@ -324,7 +325,7 @@ class CLikeCompiler(Compiler):
         mlog.debug('Running test binary command: ', mesonlib.join_args(cmdlist))
         try:
             # fortran code writes to stdout
-            pe = subprocess.run(cmdlist, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            pe = safe_command.run(subprocess.run, cmdlist, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception as e:
             raise mesonlib.EnvironmentException(f'Could not invoke sanity test executable: {e!s}.')
         if pe.returncode != 0:

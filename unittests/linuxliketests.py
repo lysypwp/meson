@@ -36,6 +36,7 @@ from mesonbuild.compilers.objc import AppleClangObjCCompiler
 from mesonbuild.compilers.objcpp import AppleClangObjCPPCompiler
 from mesonbuild.dependencies.pkgconfig import PkgConfigDependency, PkgConfigCLI, PkgConfigInterface
 import mesonbuild.modules.pkgconfig
+from security import safe_command
 
 PKG_CONFIG = os.environ.get('PKG_CONFIG', 'pkg-config')
 
@@ -293,8 +294,8 @@ class LinuxlikeTests(BasePlatformTests):
         Test that qt4 and qt5 detection with pkgconfig works.
         '''
         # Verify Qt4 or Qt5 can be found with pkg-config
-        qt4 = subprocess.call([PKG_CONFIG, '--exists', 'QtCore'])
-        qt5 = subprocess.call([PKG_CONFIG, '--exists', 'Qt5Core'])
+        qt4 = safe_command.run(subprocess.call, [PKG_CONFIG, '--exists', 'QtCore'])
+        qt5 = safe_command.run(subprocess.call, [PKG_CONFIG, '--exists', 'Qt5Core'])
         testdir = os.path.join(self.framework_test_dir, '4 qt')
         self.init(testdir, extra_args=['-Dmethod=pkg-config'])
         # Confirm that the dependency was found with pkg-config
@@ -775,14 +776,14 @@ class LinuxlikeTests(BasePlatformTests):
         self.assertTrue(os.path.isfile(installed_lib))
         # Must fail when run without LD_LIBRARY_PATH to ensure that
         # rpath has been properly stripped rather than pointing to the builddir.
-        self.assertNotEqual(subprocess.call(installed_exe, stderr=subprocess.DEVNULL), 0)
+        self.assertNotEqual(safe_command.run(subprocess.call, installed_exe, stderr=subprocess.DEVNULL), 0)
         # When LD_LIBRARY_PATH is set it should start working.
         # For some reason setting LD_LIBRARY_PATH in os.environ fails
         # when all tests are run (but works when only this test is run),
         # but doing this explicitly works.
         env = os.environ.copy()
         env['LD_LIBRARY_PATH'] = ':'.join([installed_libdir, env.get('LD_LIBRARY_PATH', '')])
-        self.assertEqual(subprocess.call(installed_exe, env=env), 0)
+        self.assertEqual(safe_command.run(subprocess.call, installed_exe, env=env), 0)
         # Ensure that introspect --installed works
         installed = self.introspect('--installed')
         for v in installed.values():
@@ -834,7 +835,7 @@ class LinuxlikeTests(BasePlatformTests):
                 gobject_found = True
         self.assertTrue(glib_found)
         self.assertTrue(gobject_found)
-        if subprocess.call([PKG_CONFIG, '--exists', 'glib-2.0 >= 2.56.2']) != 0:
+        if safe_command.run(subprocess.call, [PKG_CONFIG, '--exists', 'glib-2.0 >= 2.56.2']) != 0:
             raise SkipTest('glib >= 2.56.2 needed for the rest')
         targets = self.introspect('--targets')
         docbook_target = None
@@ -1062,7 +1063,7 @@ class LinuxlikeTests(BasePlatformTests):
     def test_pkgconfig_usage(self):
         testdir1 = os.path.join(self.unit_test_dir, '27 pkgconfig usage/dependency')
         testdir2 = os.path.join(self.unit_test_dir, '27 pkgconfig usage/dependee')
-        if subprocess.call([PKG_CONFIG, '--cflags', 'glib-2.0'],
+        if safe_command.run(subprocess.call, [PKG_CONFIG, '--cflags', 'glib-2.0'],
                            stdout=subprocess.DEVNULL,
                            stderr=subprocess.DEVNULL) != 0:
             raise SkipTest('Glib 2.0 dependency not available.')
@@ -1702,7 +1703,7 @@ class LinuxlikeTests(BasePlatformTests):
         ar = shutil.which('ar')
         self.assertPathExists(outlib)
         self.assertIsNotNone(ar)
-        p = subprocess.run([ar, 't', outlib],
+        p = safe_command.run(subprocess.run, [ar, 't', outlib],
                            stdout=subprocess.PIPE,
                            stderr=subprocess.DEVNULL,
                            text=True, timeout=1)

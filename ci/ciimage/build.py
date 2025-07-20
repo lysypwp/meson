@@ -9,6 +9,7 @@ import subprocess
 from tempfile import TemporaryDirectory
 from pathlib import Path
 import typing as T
+from security import safe_command
 
 image_namespace = 'mesonbuild'
 
@@ -109,7 +110,7 @@ class Builder(BuilderBase):
         self.gen_dockerfile()
 
         cmd_git = [self.git, 'rev-parse', '--short', 'HEAD']
-        res = subprocess.run(cmd_git, cwd=self.data_dir, stdout=subprocess.PIPE)
+        res = safe_command.run(subprocess.run, cmd_git, cwd=self.data_dir, stdout=subprocess.PIPE)
         if res.returncode != 0:
             raise RuntimeError('Failed to get the current commit hash')
         commit_hash = res.stdout.decode().strip()
@@ -121,7 +122,7 @@ class Builder(BuilderBase):
             '--pull',
             self.temp_dir.as_posix(),
         ]
-        if subprocess.run(cmd).returncode != 0:
+        if safe_command.run(subprocess.run, cmd).returncode != 0:
             raise RuntimeError('Failed to build the docker image')
 
 class ImageTester(BuilderBase):
@@ -163,7 +164,7 @@ class ImageTester(BuilderBase):
                 '-t', 'meson_test_image',
                 self.temp_dir.as_posix(),
             ]
-            if subprocess.run(build_cmd).returncode != 0:
+            if safe_command.run(subprocess.run, build_cmd).returncode != 0:
                 raise RuntimeError('Failed to build the test docker image')
 
             test_cmd = []
@@ -185,11 +186,11 @@ class ImageTester(BuilderBase):
                     '/bin/bash', '-xc', 'source /ci/env_vars.sh; cd meson; ./run_tests.py $CI_ARGS'
                 ]
 
-            if subprocess.run(test_cmd).returncode != 0 and not tty:
+            if safe_command.run(subprocess.run, test_cmd).returncode != 0 and not tty:
                 raise RuntimeError('Running tests failed')
         finally:
             cleanup_cmd = [self.docker, 'rmi', '-f', 'meson_test_image']
-            subprocess.run(cleanup_cmd).returncode
+            safe_command.run(subprocess.run, cleanup_cmd).returncode
 
 class ImageTTY(BuilderBase):
     def __init__(self, data_dir: Path, temp_dir: Path, ci_root: Path) -> None:
@@ -211,10 +212,10 @@ class ImageTTY(BuilderBase):
                     + '[ -f ci/ciimage/user.sh ] && exec /bin/bash --init-file ci/ciimage/user.sh;'
                     + 'exec /bin/bash;'
             ]
-            subprocess.run(tty_cmd).returncode != 0
+            safe_command.run(subprocess.run, tty_cmd).returncode != 0
         finally:
             cleanup_cmd = [self.docker, 'rm', '-f', 'meson_test_container']
-            subprocess.run(cleanup_cmd).returncode
+            safe_command.run(subprocess.run, cleanup_cmd).returncode
 
 
 def main() -> None:

@@ -13,6 +13,7 @@ from mesonbuild.ast import IntrospectionInterpreter, AstIDGenerator
 from mesonbuild.ast.printer import RawPrinter
 from mesonbuild.mesonlib import windows_proof_rmtree
 from .baseplatformtests import BasePlatformTests
+from security import safe_command
 
 class RewriterTests(BasePlatformTests):
     def setUp(self):
@@ -28,7 +29,7 @@ class RewriterTests(BasePlatformTests):
         if isinstance(args, str):
             args = [args]
         command = self.rewrite_command + ['--verbose', '--skip', '--sourcedir', directory] + args
-        p = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        p = safe_command.run(subprocess.run, command, capture_output=True, text=True, timeout=60)
         print('STDOUT:')
         print(p.stdout)
         print('STDERR:')
